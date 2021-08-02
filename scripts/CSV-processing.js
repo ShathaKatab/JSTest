@@ -1,18 +1,15 @@
 
-
-// Select Upload-Area
 const uploadArea = document.querySelector('#uploadArea')
-const dropZoon = document.querySelector('#dropZoon');
+const uploadZoon = document.querySelector('#uploadZoon');
 const loadingText = document.querySelector('#loadingText');
 const fileInput = document.querySelector('#fileInput');
 const fileDetails = document.querySelector('#fileDetails');
 const uploadedFile = document.querySelector('#uploadedFile');
 const uploadedFileInfo = document.querySelector('#uploadedFileInfo');
 const uploadedFileName = document.querySelector('.uploaded-file__name');
-const uploadedFileIconText = document.querySelector('.uploaded-file__icon-text');
 const uploadedFileCounter = document.querySelector('.uploaded-file__counter');
 
-dropZoon.addEventListener('click', function (event) {
+uploadZoon.addEventListener('click', function (event) {
     fileInput.click();
 });
 
@@ -21,7 +18,6 @@ fileInput.addEventListener('change', function (event) {
     uploadFile(file);
 });
 
-// Upload File Function
 function uploadFile(file) {
     const fileReader = new FileReader();
     fileReader.readAsText(file);
@@ -29,8 +25,11 @@ function uploadFile(file) {
     fileReader.onerror = errorHandler;
     const fileType = file.type;
     if (fileValidate(fileType)) {
-        dropZoon.classList.add('drop-zoon--Uploaded');
-        loadingText.style.display = "block";
+        //do some styles
+        uploadZoon.style.display = 'none'
+        loadingText.style.visibility = "block";
+        document.querySelector('#input-textarea').style.visibility = 'visible';
+        document.querySelector('#output-textarea').style.visibility = 'visible';
         uploadedFile.classList.remove('uploaded-file--open');
         uploadedFileInfo.classList.remove('uploaded-file__info--active');
         fileReader.addEventListener('load', function () {
@@ -44,7 +43,7 @@ function uploadFile(file) {
             uploadedFileName.innerHTML = file.name;
             progressMove();
         });
-        fileReader.readAsDataURL(file);
+
     } else {
         this;
     };
@@ -77,7 +76,6 @@ function loadHandler(event) {
     processData(csv);
 }
 
-
 function fileValidate(fileType) {
     let isCSV = fileType.includes('csv');
     if (isCSV.length !== 0) {
@@ -88,21 +86,67 @@ function fileValidate(fileType) {
 };
 
 function processData(csv) {
-    let allTextLines = csv.split(/\r\n|\n/);
-    let lines = [];
-    for (let i=0; i<allTextLines.length; i++) {
-        var data = allTextLines[i].split(';');
-        var tarr = [];
-        for (var j=0; j<data.length; j++) {
-            tarr.push(data[j]);
+    let allCSVLines = csv.split(/\r\n|\n/);
+    let matrixBeforeProcessing = [];
+    for (let i=0; i< allCSVLines.length; i++) {
+        let data = allCSVLines[i].split(',');
+        let val = [];
+        for (let j=0; j<data.length; j++) {
+            val.push(data[j]);
         }
-        lines.push(tarr);
+        matrixBeforeProcessing.push(val);
     }
-    console.log(lines,'lines');
+    document.querySelector(`#input-textarea`).innerHTML = matrixBeforeProcessing
+        .map((item) => {
+            return item.join(",");
+        }).join("\n")
+     calculateBadVal(matrixBeforeProcessing)
 }
 
 function errorHandler(evt) {
-    if(evt.target.error.name == "NotReadableError") {
-        alert("Canno't read file !");
+    if(evt.target.error.name === "NotReadableError") {
+        alert("Cannot read file !");
     }
+}
+
+function calculateBadVal(matrix){
+    for(let i = 0; i < matrix.length; i++) {
+        const line = matrix[i]
+        for(let j = 0; j < line.length; j++) {
+            const element = matrix[i][j];
+            if (element == 0){
+               matrix = fixBadVal(matrix , i , j)
+            }
+        }
+    }
+    document.querySelector(`#output-textarea`).innerHTML = matrix
+        .map((item) => {
+            return item.join(",");
+        }).join("\n")
+}
+
+function fixBadVal(matrix, i, j) {
+    if (i > 0 && i + 1 < matrix.length && matrix[i - 1][j] !== 0 && matrix[i + 1][j] !== 0) {
+        matrix[i][j] = (Math.round((parseInt(matrix[i-1][j]) + parseInt(matrix[i+1][j])) / 2))
+    }
+    if (j > 0 && j + 1 < matrix[i].length && matrix[i][j - 1] !== 0 && matrix[i][j + 1] !== 0) {
+        matrix[i][j] = (Math.round((parseInt(matrix[i][j-1]) + parseInt(matrix[i][j+1 ])) / 2))
+    }
+    if (i > 0 && i + 1 < matrix.length && j > 0 && j + 1 < matrix[i].length && matrix[i - 1][j - 1] !== 0 && matrix[i + 1][j + 1] !== 0){
+        matrix[i][j] = (Math.round((parseInt(matrix[i - 1][j - 1]) + parseInt(matrix[i + 1][j + 1])) / 2))
+    }
+    if (i === 0 && j + 1 === matrix.length && matrix[0][j - 1] !== 0 && matrix[i+1][j] !== 0 ){
+        matrix[i][j] = (Math.round((parseInt(matrix[i][j-1]) + parseInt(matrix[i+1][j])) / 2))
+    }
+    if (i === 0 && j===0  && matrix[0][j + 1] !== 0 && matrix[i+1][0] !== 0 ){
+        matrix[i][j] = (Math.round((parseInt(matrix[0][j + 1]) + parseInt(matrix[i+1][0])) / 2))
+    }
+    if (i+1 === matrix.length && j === 0 && matrix[i-1][j] !== 0 && matrix[i][j+1] !== 0){
+        matrix[i][j] = (Math.round((parseInt(matrix[i-1][j]) + parseInt(matrix[i][j+1])) / 2))
+    }
+    if (i+1 === matrix.length && j + 1 === matrix.length && matrix[i][j-1] !== 0 && matrix[i-1][j] !== 0){
+        matrix[i][j] = (Math.round((parseInt(matrix[i][j-1]) + parseInt(matrix[i-1][j])) / 2))
+    }
+    return matrix
+
 }

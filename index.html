@@ -13,19 +13,18 @@
             File should be an CSV
         </p>
     </div>
+    <div id="uploadZoon" class="upload-area-upload-zoon upload-zoon">
+        <div>
+            <p class="upload-zoon-paragraph">Click to browse</p>
+            <span id="loadingText" class="loading-text">Please Wait</span>
+            <input type="file" id="fileInput" class="file-input" accept=".csv">
+        </div>
 
-    <!-- Drop Zoon -->
-    <div id="dropZoon" class="upload-area__drop-zoon drop-zoon">
-    <span class="drop-zoon__icon">
-      <i class='bx bxs-file-image'></i>
-    </span>
-        <p class="drop-zoon__paragraph">Click to browse</p>
-        <span id="loadingText" class="drop-zoon__loading-text">Please Wait</span>
-        <input type="file" id="fileInput" class="drop-zoon__file-input" accept=".csv">
     </div>
-    <!-- End Drop Zoon -->
-
-    <!-- File Details -->
+    <div style="display: flex; justify-content: space-evenly">
+        <textarea class="input-textarea" id="input-textarea" readonly></textarea>
+        <textarea class="input-textarea" id="output-textarea" readonly></textarea>
+    </div>
     <div id="fileDetails" class="upload-area__file-details file-details">
         <h3 class="file-details__title">Uploaded File</h3>
 
