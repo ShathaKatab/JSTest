@@ -18,6 +18,10 @@ fileInput.addEventListener('change', function (event) {
     uploadFile(file);
 });
 
+/**
+ * upload CSV file
+ * @param  file
+ */
 function uploadFile(file) {
     const fileReader = new FileReader();
     fileReader.readAsText(file);
@@ -28,8 +32,7 @@ function uploadFile(file) {
         //do some styles
         uploadZoon.style.display = 'none'
         loadingText.style.visibility = "block";
-        document.querySelector('#input-textarea').style.visibility = 'visible';
-        document.querySelector('#output-textarea').style.visibility = 'visible';
+        document.querySelector('.resultBlock').style.visibility = 'visible';
         uploadedFile.classList.remove('uploaded-file--open');
         uploadedFileInfo.classList.remove('uploaded-file__info--active');
         fileReader.addEventListener('load', function () {
@@ -43,12 +46,14 @@ function uploadFile(file) {
             uploadedFileName.innerHTML = file.name;
             progressMove();
         });
-
     } else {
         this;
     };
 };
 
+/**
+ *  progress bar for uploading file progress
+ */
 function progressMove() {
     // Counter Start
     let counter = 0;
@@ -76,6 +81,10 @@ function loadHandler(event) {
     processData(csv);
 }
 
+/**
+ * check if file type is valid when upload
+ * @param {string} value
+ */
 function fileValidate(fileType) {
     let isCSV = fileType.includes('csv');
     if (isCSV.length !== 0) {
@@ -85,6 +94,11 @@ function fileValidate(fileType) {
     };
 };
 
+
+/**
+ * read data from csv file, implement it as 2d matrix and display it
+ * @param  csv
+ */
 function processData(csv) {
     let allCSVLines = csv.split(/\r\n|\n/);
     let matrixBeforeProcessing = [];
@@ -109,6 +123,10 @@ function errorHandler(evt) {
     }
 }
 
+/**
+ * search for bad values "zeros" inside 2d array, replace bad values and display output
+ * @param {array} matrix
+ */
 function calculateBadVal(matrix){
     for(let i = 0; i < matrix.length; i++) {
         const line = matrix[i]
@@ -125,6 +143,13 @@ function calculateBadVal(matrix){
         }).join("\n")
 }
 
+
+/**
+ * replace bad values in array with a valid value and handle if bad values are located on 2d array corners
+ * @param {array} matrix
+ * @param {number} i,j
+ * @return [] after replace bad value
+ */
 function fixBadVal(matrix, i, j) {
     if (i > 0 && i + 1 < matrix.length && matrix[i - 1][j] !== 0 && matrix[i + 1][j] !== 0) {
         matrix[i][j] = (Math.round((parseInt(matrix[i-1][j]) + parseInt(matrix[i+1][j])) / 2))

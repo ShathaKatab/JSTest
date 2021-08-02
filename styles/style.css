@@ -241,7 +241,6 @@ body {
     color: var(--clr-light-gray);
 }
 textarea{
-    visibility: hidden;
     outline: none;
     position: relative;
     height: 11.25rem;
@@ -263,4 +262,10 @@ textarea:hover {
 
 textarea:focus {
     border-color: #4D90FE;
+}
+
+.resultBlock{
+    visibility: hidden;
+    display: flex;
+    justify-content: space-evenly
 }
